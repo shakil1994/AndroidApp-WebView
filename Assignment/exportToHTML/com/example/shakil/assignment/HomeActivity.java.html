@@ -1,0 +1,436 @@
+<html>
+<head>
+<title>HomeActivity.java</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<style type="text/css">
+.s0 { color: #cc7832;}
+.s1 { color: #a9b7c6;}
+.s2 { color: #808080;}
+.s3 { color: #6a8759;}
+.s4 { color: #6897bb;}
+</style>
+</head>
+<body bgcolor="#2b2b2b">
+<table CELLSPACING=0 CELLPADDING=5 COLS=1 WIDTH="100%" BGCOLOR="#606060" >
+<tr><td><center>
+<font face="Arial, Helvetica" color="#000000">
+HomeActivity.java</font>
+</center></td></tr></table>
+<pre><span class="s0">package </span><span class="s1">com.example.shakil.assignment</span><span class="s0">;</span>
+
+<span class="s0">import </span><span class="s1">androidx.appcompat.app.AppCompatActivity</span><span class="s0">;</span>
+
+<span class="s0">import </span><span class="s1">android.Manifest</span><span class="s0">;</span>
+<span class="s0">import </span><span class="s1">android.annotation.SuppressLint</span><span class="s0">;</span>
+<span class="s0">import </span><span class="s1">android.app.Activity</span><span class="s0">;</span>
+<span class="s0">import </span><span class="s1">android.app.AlertDialog</span><span class="s0">;</span>
+<span class="s0">import </span><span class="s1">android.content.Context</span><span class="s0">;</span>
+<span class="s0">import </span><span class="s1">android.content.DialogInterface</span><span class="s0">;</span>
+<span class="s0">import </span><span class="s1">android.content.Intent</span><span class="s0">;</span>
+<span class="s0">import </span><span class="s1">android.net.ConnectivityManager</span><span class="s0">;</span>
+<span class="s0">import </span><span class="s1">android.net.NetworkInfo</span><span class="s0">;</span>
+<span class="s0">import </span><span class="s1">android.net.Uri</span><span class="s0">;</span>
+<span class="s0">import </span><span class="s1">android.net.http.SslError</span><span class="s0">;</span>
+<span class="s0">import </span><span class="s1">android.os.Build</span><span class="s0">;</span>
+<span class="s0">import </span><span class="s1">android.os.Bundle</span><span class="s0">;</span>
+<span class="s0">import </span><span class="s1">android.os.Environment</span><span class="s0">;</span>
+<span class="s0">import </span><span class="s1">android.os.Parcelable</span><span class="s0">;</span>
+<span class="s0">import </span><span class="s1">android.provider.MediaStore</span><span class="s0">;</span>
+<span class="s0">import </span><span class="s1">android.util.Log</span><span class="s0">;</span>
+<span class="s0">import </span><span class="s1">android.view.KeyEvent</span><span class="s0">;</span>
+<span class="s0">import </span><span class="s1">android.view.View</span><span class="s0">;</span>
+<span class="s0">import </span><span class="s1">android.webkit.SslErrorHandler</span><span class="s0">;</span>
+<span class="s0">import </span><span class="s1">android.webkit.ValueCallback</span><span class="s0">;</span>
+<span class="s0">import </span><span class="s1">android.webkit.WebChromeClient</span><span class="s0">;</span>
+<span class="s0">import </span><span class="s1">android.webkit.WebResourceRequest</span><span class="s0">;</span>
+<span class="s0">import </span><span class="s1">android.webkit.WebSettings</span><span class="s0">;</span>
+<span class="s0">import </span><span class="s1">android.webkit.WebView</span><span class="s0">;</span>
+<span class="s0">import </span><span class="s1">android.webkit.WebViewClient</span><span class="s0">;</span>
+<span class="s0">import </span><span class="s1">android.widget.Button</span><span class="s0">;</span>
+<span class="s0">import </span><span class="s1">android.widget.ProgressBar</span><span class="s0">;</span>
+<span class="s0">import </span><span class="s1">android.widget.RelativeLayout</span><span class="s0">;</span>
+<span class="s0">import </span><span class="s1">android.widget.Toast</span><span class="s0">;</span>
+
+<span class="s0">import </span><span class="s1">com.karumi.dexter.Dexter</span><span class="s0">;</span>
+<span class="s0">import </span><span class="s1">com.karumi.dexter.MultiplePermissionsReport</span><span class="s0">;</span>
+<span class="s0">import </span><span class="s1">com.karumi.dexter.PermissionToken</span><span class="s0">;</span>
+<span class="s0">import </span><span class="s1">com.karumi.dexter.listener.multi.MultiplePermissionsListener</span><span class="s0">;</span>
+
+<span class="s0">import </span><span class="s1">java.io.File</span><span class="s0">;</span>
+<span class="s0">import </span><span class="s1">java.io.IOException</span><span class="s0">;</span>
+<span class="s0">import </span><span class="s1">java.util.List</span><span class="s0">;</span>
+
+<span class="s0">public class </span><span class="s1">HomeActivity </span><span class="s0">extends </span><span class="s1">AppCompatActivity {</span>
+
+    <span class="s1">WebView webView</span><span class="s0">;</span>
+    <span class="s2">//private String webUrl = &quot;https://www.poribaar.com&quot;;</span>
+    <span class="s0">private </span><span class="s1">String webUrl = </span><span class="s3">&quot;https://poribaar.com/ecommerce/&quot;</span><span class="s0">;</span>
+
+    <span class="s2">//AlertDialog dialog;</span>
+    <span class="s1">ProgressBar progressBarWeb</span><span class="s0">;</span>
+
+    <span class="s1">RelativeLayout relativeLayout</span><span class="s0">;</span>
+    <span class="s1">Button btnNoInternetConnection</span><span class="s0">;</span>
+
+    <span class="s0">private static final </span><span class="s1">String TAG = HomeActivity.</span><span class="s0">class</span><span class="s1">.getSimpleName()</span><span class="s0">;</span>
+
+    <span class="s0">private static final int </span><span class="s1">FILECHOOSER_RESULTCODE = </span><span class="s4">1</span><span class="s0">;</span>
+    <span class="s0">private </span><span class="s1">ValueCallback&lt;Uri&gt; mUploadMessage</span><span class="s0">;</span>
+    <span class="s0">private </span><span class="s1">Uri mCapturedImageURI = </span><span class="s0">null;</span>
+
+    <span class="s2">// the same for Android 5.0 methods only</span>
+    <span class="s0">private </span><span class="s1">ValueCallback&lt;Uri[]&gt; mFilePathCallback</span><span class="s0">;</span>
+    <span class="s0">private </span><span class="s1">String mCameraPhotoPath</span><span class="s0">;</span>
+
+    <span class="s1">@Override</span>
+    <span class="s0">protected void </span><span class="s1">onCreate(</span><span class="s0">final </span><span class="s1">Bundle savedInstanceState) {</span>
+        <span class="s0">super</span><span class="s1">.onCreate(savedInstanceState)</span><span class="s0">;</span>
+        <span class="s1">setContentView(R.layout.activity_home)</span><span class="s0">;</span>
+
+        <span class="s1">webView = findViewById(R.id.webview)</span><span class="s0">;</span>
+        <span class="s1">relativeLayout = findViewById(R.id.relativeLayout)</span><span class="s0">;</span>
+        <span class="s1">btnNoInternetConnection = findViewById(R.id.btnNoInternetConnection)</span><span class="s0">;</span>
+
+        <span class="s1">progressBarWeb = findViewById(R.id.progressBar)</span><span class="s0">;</span>
+
+        <span class="s2">//dialog = new SpotsDialog.Builder().setCancelable(false).setContext(this).build();</span>
+
+        <span class="s1">Dexter.withActivity(</span><span class="s0">this</span><span class="s1">).withPermissions(</span><span class="s0">new </span><span class="s1">String[]{</span>
+                <span class="s1">Manifest.permission.CALL_PHONE</span><span class="s0">,</span>
+                <span class="s1">Manifest.permission.CAMERA</span><span class="s0">,</span>
+                <span class="s1">Manifest.permission.READ_CONTACTS</span><span class="s0">,</span>
+                <span class="s1">Manifest.permission.WRITE_CONTACTS</span><span class="s0">,</span>
+                <span class="s1">Manifest.permission.READ_EXTERNAL_STORAGE</span><span class="s0">,</span>
+                <span class="s1">Manifest.permission.WRITE_EXTERNAL_STORAGE</span><span class="s0">,</span>
+                <span class="s1">Manifest.permission.ACCESS_FINE_LOCATION</span><span class="s0">,</span>
+                <span class="s1">Manifest.permission.ACCESS_COARSE_LOCATION</span>
+        <span class="s1">}).withListener(</span><span class="s0">new </span><span class="s1">MultiplePermissionsListener() {</span>
+            <span class="s1">@SuppressLint(</span><span class="s3">&quot;SetJavaScriptEnabled&quot;</span><span class="s1">)</span>
+            <span class="s1">@Override</span>
+            <span class="s0">public void </span><span class="s1">onPermissionsChecked(MultiplePermissionsReport report) {</span>
+                <span class="s0">if </span><span class="s1">(savedInstanceState != </span><span class="s0">null</span><span class="s1">) {</span>
+                    <span class="s1">webView.restoreState(savedInstanceState)</span><span class="s0">;</span>
+                <span class="s1">} </span><span class="s0">else </span><span class="s1">{</span>
+                    <span class="s1">checkConnection()</span><span class="s0">;</span>
+
+                    <span class="s1">WebSettings webSettings = webView.getSettings()</span><span class="s0">;</span>
+                    <span class="s1">webSettings.setJavaScriptEnabled(</span><span class="s0">true</span><span class="s1">)</span><span class="s0">;</span>
+                    <span class="s1">webSettings.setLoadsImagesAutomatically(</span><span class="s0">true</span><span class="s1">)</span><span class="s0">;</span>
+                    <span class="s1">webSettings.setJavaScriptCanOpenWindowsAutomatically(</span><span class="s0">true</span><span class="s1">)</span><span class="s0">;</span>
+                    <span class="s1">webSettings.setAllowFileAccessFromFileURLs(</span><span class="s0">true</span><span class="s1">)</span><span class="s0">;</span>
+                    <span class="s1">webSettings.setAllowUniversalAccessFromFileURLs(</span><span class="s0">true</span><span class="s1">)</span><span class="s0">;</span>
+                    <span class="s1">webSettings.setPluginState(WebSettings.PluginState.ON)</span><span class="s0">;</span>
+                    <span class="s1">webSettings.setMediaPlaybackRequiresUserGesture(</span><span class="s0">false</span><span class="s1">)</span><span class="s0">;</span>
+                    <span class="s1">webSettings.setAllowFileAccess(</span><span class="s0">true</span><span class="s1">)</span><span class="s0">;</span>
+                    <span class="s1">webSettings.setDomStorageEnabled(</span><span class="s0">true</span><span class="s1">)</span><span class="s0">;</span>
+                    <span class="s1">webSettings.setAppCacheEnabled(</span><span class="s0">true</span><span class="s1">)</span><span class="s0">;</span>
+                    <span class="s1">webSettings.setLoadsImagesAutomatically(</span><span class="s0">true</span><span class="s1">)</span><span class="s0">;</span>
+                    <span class="s1">webSettings.setMixedContentMode(WebSettings.MIXED_CONTENT_ALWAYS_ALLOW)</span><span class="s0">;</span>
+                    <span class="s1">webSettings.setUseWideViewPort(</span><span class="s0">true</span><span class="s1">)</span><span class="s0">;</span>
+                    <span class="s1">webSettings.setLoadWithOverviewMode(</span><span class="s0">true</span><span class="s1">)</span><span class="s0">;</span>
+                    <span class="s1">webView.loadUrl(webUrl)</span><span class="s0">;</span>
+                <span class="s1">}</span>
+
+                <span class="s1">webView.setWebViewClient(</span><span class="s0">new </span><span class="s1">WebViewClient() {</span>
+                    <span class="s1">@Override</span>
+                    <span class="s0">public boolean </span><span class="s1">shouldOverrideUrlLoading(WebView view</span><span class="s0">, </span><span class="s1">WebResourceRequest request) {</span>
+                        <span class="s1">view.loadUrl(webUrl)</span><span class="s0">;</span>
+                        <span class="s2">//dialog.dismiss();</span>
+                        <span class="s0">return true;</span>
+                    <span class="s1">}</span>
+
+                    <span class="s1">@Override</span>
+                    <span class="s0">public void </span><span class="s1">onReceivedSslError(WebView view</span><span class="s0">, </span><span class="s1">SslErrorHandler handler</span><span class="s0">, </span><span class="s1">SslError error) {</span>
+                        <span class="s1">handler.proceed()</span><span class="s0">; </span><span class="s2">// Ignore SSL certificate errors</span>
+                    <span class="s1">}</span>
+                <span class="s1">})</span><span class="s0">;</span>
+
+                <span class="s1">webView.setWebChromeClient(</span><span class="s0">new </span><span class="s1">WebChromeClient() {</span>
+                    <span class="s1">@Override</span>
+                    <span class="s0">public void </span><span class="s1">onProgressChanged(WebView view</span><span class="s0">, int </span><span class="s1">newProgress) {</span>
+                        <span class="s2">/*dialog.show(); 
+                        if (newProgress == 100){ 
+                            dialog.dismiss(); 
+                        }*/</span>
+                        <span class="s1">progressBarWeb.setVisibility(View.VISIBLE)</span><span class="s0">;</span>
+                        <span class="s1">progressBarWeb.setProgress(newProgress)</span><span class="s0">;</span>
+                        <span class="s2">//setTitle(&quot;Loading...&quot;);</span>
+                        <span class="s0">if </span><span class="s1">(newProgress == </span><span class="s4">100</span><span class="s1">) {</span>
+
+                            <span class="s1">progressBarWeb.setVisibility(View.GONE)</span><span class="s0">;</span>
+                            <span class="s2">//setTitle(view.getTitle());</span>
+                        <span class="s1">}</span>
+                        <span class="s0">super</span><span class="s1">.onProgressChanged(view</span><span class="s0">, </span><span class="s1">newProgress)</span><span class="s0">;</span>
+                    <span class="s1">}</span>
+
+                    <span class="s2">// for Lollipop, all in one</span>
+                    <span class="s0">public boolean </span><span class="s1">onShowFileChooser(</span>
+                            <span class="s1">WebView webView</span><span class="s0">, </span><span class="s1">ValueCallback&lt;Uri[]&gt; filePathCallback</span><span class="s0">,</span>
+                            <span class="s1">WebChromeClient.FileChooserParams fileChooserParams) {</span>
+                        <span class="s0">if </span><span class="s1">(mFilePathCallback != </span><span class="s0">null</span><span class="s1">) {</span>
+                            <span class="s1">mFilePathCallback.onReceiveValue(</span><span class="s0">null</span><span class="s1">)</span><span class="s0">;</span>
+                        <span class="s1">}</span>
+                        <span class="s1">mFilePathCallback = filePathCallback</span><span class="s0">;</span>
+
+                        <span class="s1">Intent takePictureIntent = </span><span class="s0">new </span><span class="s1">Intent(MediaStore.ACTION_IMAGE_CAPTURE)</span><span class="s0">;</span>
+                        <span class="s0">if </span><span class="s1">(takePictureIntent.resolveActivity(getPackageManager()) != </span><span class="s0">null</span><span class="s1">) {</span>
+
+                            <span class="s2">// create the file where the photo should go</span>
+                            <span class="s1">File photoFile = </span><span class="s0">null;</span>
+                            <span class="s0">try </span><span class="s1">{</span>
+                                <span class="s1">photoFile = createImageFile()</span><span class="s0">;</span>
+                                <span class="s1">takePictureIntent.putExtra(</span><span class="s3">&quot;PhotoPath&quot;</span><span class="s0">, </span><span class="s1">mCameraPhotoPath)</span><span class="s0">;</span>
+                            <span class="s1">} </span><span class="s0">catch </span><span class="s1">(IOException ex) {</span>
+                                <span class="s2">// Error occurred while creating the File</span>
+                                <span class="s1">Log.e(TAG</span><span class="s0">, </span><span class="s3">&quot;Unable to create Image File&quot;</span><span class="s0">, </span><span class="s1">ex)</span><span class="s0">;</span>
+                            <span class="s1">}</span>
+
+                            <span class="s2">// continue only if the file was successfully created</span>
+                            <span class="s0">if </span><span class="s1">(photoFile != </span><span class="s0">null</span><span class="s1">) {</span>
+                                <span class="s1">mCameraPhotoPath = </span><span class="s3">&quot;file:&quot; </span><span class="s1">+ photoFile.getAbsolutePath()</span><span class="s0">;</span>
+                                <span class="s1">takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT</span><span class="s0">,</span>
+                                        <span class="s1">Uri.fromFile(photoFile))</span><span class="s0">;</span>
+                            <span class="s1">} </span><span class="s0">else </span><span class="s1">{</span>
+                                <span class="s1">takePictureIntent = </span><span class="s0">null;</span>
+                            <span class="s1">}</span>
+                        <span class="s1">}</span>
+
+                        <span class="s1">Intent contentSelectionIntent = </span><span class="s0">new </span><span class="s1">Intent(Intent.ACTION_GET_CONTENT)</span><span class="s0">;</span>
+                        <span class="s1">contentSelectionIntent.addCategory(Intent.CATEGORY_OPENABLE)</span><span class="s0">;</span>
+                        <span class="s1">contentSelectionIntent.setType(</span><span class="s3">&quot;image/*&quot;</span><span class="s1">)</span><span class="s0">;</span>
+
+                        <span class="s1">Intent[] intentArray</span><span class="s0">;</span>
+                        <span class="s0">if </span><span class="s1">(takePictureIntent != </span><span class="s0">null</span><span class="s1">) {</span>
+                            <span class="s1">intentArray = </span><span class="s0">new </span><span class="s1">Intent[]{takePictureIntent}</span><span class="s0">;</span>
+                        <span class="s1">} </span><span class="s0">else </span><span class="s1">{</span>
+                            <span class="s1">intentArray = </span><span class="s0">new </span><span class="s1">Intent[</span><span class="s4">0</span><span class="s1">]</span><span class="s0">;</span>
+                        <span class="s1">}</span>
+
+                        <span class="s1">Intent chooserIntent = </span><span class="s0">new </span><span class="s1">Intent(Intent.ACTION_CHOOSER)</span><span class="s0">;</span>
+                        <span class="s1">chooserIntent.putExtra(Intent.EXTRA_INTENT</span><span class="s0">, </span><span class="s1">contentSelectionIntent)</span><span class="s0">;</span>
+                        <span class="s1">chooserIntent.putExtra(Intent.EXTRA_TITLE</span><span class="s0">, </span><span class="s3">&quot;Choose Image&quot;</span><span class="s1">)</span><span class="s0">;</span>
+                        <span class="s1">chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS</span><span class="s0">, </span><span class="s1">intentArray)</span><span class="s0">;</span>
+
+                        <span class="s1">startActivityForResult(chooserIntent</span><span class="s0">, </span><span class="s1">FILECHOOSER_RESULTCODE)</span><span class="s0">;</span>
+
+                        <span class="s0">return true;</span>
+                    <span class="s1">}</span>
+
+                    <span class="s2">// creating image files (Lollipop only)</span>
+                    <span class="s0">private </span><span class="s1">File createImageFile() </span><span class="s0">throws </span><span class="s1">IOException {</span>
+
+                        <span class="s1">File imageStorageDir = </span><span class="s0">new </span><span class="s1">File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)</span><span class="s0">, </span><span class="s3">&quot;DirectoryNameHere&quot;</span><span class="s1">)</span><span class="s0">;</span>
+
+                        <span class="s0">if </span><span class="s1">(!imageStorageDir.exists()) {</span>
+                            <span class="s1">imageStorageDir.mkdirs()</span><span class="s0">;</span>
+                        <span class="s1">}</span>
+
+                        <span class="s2">// create an image file name</span>
+                        <span class="s1">imageStorageDir = </span><span class="s0">new </span><span class="s1">File(imageStorageDir + File.separator + </span><span class="s3">&quot;IMG_&quot; </span><span class="s1">+ String.valueOf(System.currentTimeMillis()) + </span><span class="s3">&quot;.jpg&quot;</span><span class="s1">)</span><span class="s0">;</span>
+                        <span class="s0">return </span><span class="s1">imageStorageDir</span><span class="s0">;</span>
+                    <span class="s1">}</span>
+
+                    <span class="s2">// openFileChooser for Android 3.0+</span>
+                    <span class="s0">public void </span><span class="s1">openFileChooser(ValueCallback&lt;Uri&gt; uploadMsg</span><span class="s0">, </span><span class="s1">String acceptType) {</span>
+                        <span class="s1">mUploadMessage = uploadMsg</span><span class="s0">;</span>
+
+                        <span class="s0">try </span><span class="s1">{</span>
+                            <span class="s1">File imageStorageDir = </span><span class="s0">new </span><span class="s1">File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)</span><span class="s0">, </span><span class="s3">&quot;DirectoryNameHere&quot;</span><span class="s1">)</span><span class="s0">;</span>
+
+                            <span class="s0">if </span><span class="s1">(!imageStorageDir.exists()) {</span>
+                                <span class="s1">imageStorageDir.mkdirs()</span><span class="s0">;</span>
+                            <span class="s1">}</span>
+
+                            <span class="s1">File file = </span><span class="s0">new </span><span class="s1">File(imageStorageDir + File.separator + </span><span class="s3">&quot;IMG_&quot; </span><span class="s1">+ String.valueOf(System.currentTimeMillis()) + </span><span class="s3">&quot;.jpg&quot;</span><span class="s1">)</span><span class="s0">;</span>
+
+                            <span class="s1">mCapturedImageURI = Uri.fromFile(file)</span><span class="s0">; </span><span class="s2">// save to the private variable</span>
+
+                            <span class="s0">final </span><span class="s1">Intent captureIntent = </span><span class="s0">new </span><span class="s1">Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE)</span><span class="s0">;</span>
+                            <span class="s1">captureIntent.putExtra(MediaStore.EXTRA_OUTPUT</span><span class="s0">, </span><span class="s1">mCapturedImageURI)</span><span class="s0">;</span>
+                            <span class="s2">// captureIntent.putExtra(MediaStore.EXTRA_SCREEN_ORIENTATION, ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);</span>
+
+                            <span class="s1">Intent i = </span><span class="s0">new </span><span class="s1">Intent(Intent.ACTION_GET_CONTENT)</span><span class="s0">;</span>
+                            <span class="s1">i.addCategory(Intent.CATEGORY_OPENABLE)</span><span class="s0">;</span>
+                            <span class="s1">i.setType(</span><span class="s3">&quot;image/*&quot;</span><span class="s1">)</span><span class="s0">;</span>
+
+                            <span class="s1">Intent chooserIntent = Intent.createChooser(i</span><span class="s0">, </span><span class="s3">&quot;Choose Image&quot;</span><span class="s1">)</span><span class="s0">;</span>
+                            <span class="s1">chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS</span><span class="s0">, new </span><span class="s1">Parcelable[]{captureIntent})</span><span class="s0">;</span>
+
+                            <span class="s1">startActivityForResult(chooserIntent</span><span class="s0">, </span><span class="s1">FILECHOOSER_RESULTCODE)</span><span class="s0">;</span>
+                        <span class="s1">} </span><span class="s0">catch </span><span class="s1">(Exception e) {</span>
+                            <span class="s1">Toast.makeText(getBaseContext()</span><span class="s0">, </span><span class="s3">&quot;Camera Exception:&quot; </span><span class="s1">+ e</span><span class="s0">, </span><span class="s1">Toast.LENGTH_LONG).show()</span><span class="s0">;</span>
+                        <span class="s1">}</span>
+
+                    <span class="s1">}</span>
+
+                    <span class="s2">// openFileChooser for Android &lt; 3.0</span>
+                    <span class="s0">public void </span><span class="s1">openFileChooser(ValueCallback&lt;Uri&gt; uploadMsg) {</span>
+                        <span class="s1">openFileChooser(uploadMsg</span><span class="s0">, </span><span class="s3">&quot;&quot;</span><span class="s1">)</span><span class="s0">;</span>
+                    <span class="s1">}</span>
+
+                    <span class="s2">// openFileChooser for other Android versions</span>
+                    <span class="s2">/* may not work on KitKat due to lack of implementation of openFileChooser() or onShowFileChooser() 
+                       https://code.google.com/p/android/issues/detail?id=62220 
+                       however newer versions of KitKat fixed it on some devices */</span>
+                    <span class="s0">public void </span><span class="s1">openFileChooser(ValueCallback&lt;Uri&gt; uploadMsg</span><span class="s0">, </span><span class="s1">String acceptType</span><span class="s0">, </span><span class="s1">String capture) {</span>
+                        <span class="s1">openFileChooser(uploadMsg</span><span class="s0">, </span><span class="s1">acceptType)</span><span class="s0">;</span>
+                    <span class="s1">}</span>
+                <span class="s1">})</span><span class="s0">;</span>
+
+                <span class="s1">btnNoInternetConnection.setOnClickListener(</span><span class="s0">new </span><span class="s1">View.OnClickListener() {</span>
+                    <span class="s1">@Override</span>
+                    <span class="s0">public void </span><span class="s1">onClick(View view) {</span>
+                        <span class="s1">checkConnection()</span><span class="s0">;</span>
+                    <span class="s1">}</span>
+                <span class="s1">})</span><span class="s0">;</span>
+            <span class="s1">}</span>
+
+            <span class="s1">@Override</span>
+            <span class="s0">public void </span><span class="s1">onPermissionRationaleShouldBeShown(List&lt;com.karumi.dexter.listener.PermissionRequest&gt; permissions</span><span class="s0">, </span><span class="s1">PermissionToken token) {</span>
+
+            <span class="s1">}</span>
+        <span class="s1">}).check()</span><span class="s0">;</span>
+
+        <span class="s1">btnNoInternetConnection.setOnClickListener(</span><span class="s0">new </span><span class="s1">View.OnClickListener() {</span>
+            <span class="s1">@Override</span>
+            <span class="s0">public void </span><span class="s1">onClick(View view) {</span>
+                <span class="s1">checkConnection()</span><span class="s0">;</span>
+            <span class="s1">}</span>
+        <span class="s1">})</span><span class="s0">;</span>
+    <span class="s1">}</span>
+
+    <span class="s1">@Override</span>
+    <span class="s0">public void </span><span class="s1">onActivityResult(</span><span class="s0">int </span><span class="s1">requestCode</span><span class="s0">, int </span><span class="s1">resultCode</span><span class="s0">, </span><span class="s1">Intent data) {</span>
+        <span class="s2">// code for all versions except of Lollipop</span>
+        <span class="s0">if </span><span class="s1">(Build.VERSION.SDK_INT &lt; Build.VERSION_CODES.LOLLIPOP) {</span>
+
+            <span class="s0">if </span><span class="s1">(requestCode == FILECHOOSER_RESULTCODE) {</span>
+                <span class="s0">if </span><span class="s1">(</span><span class="s0">null </span><span class="s1">== </span><span class="s0">this</span><span class="s1">.mUploadMessage) {</span>
+                    <span class="s0">return;</span>
+                <span class="s1">}</span>
+
+                <span class="s1">Uri result = </span><span class="s0">null;</span>
+
+                <span class="s0">try </span><span class="s1">{</span>
+                    <span class="s0">if </span><span class="s1">(resultCode != RESULT_OK) {</span>
+                        <span class="s1">result = </span><span class="s0">null;</span>
+                    <span class="s1">} </span><span class="s0">else </span><span class="s1">{</span>
+                        <span class="s2">// retrieve from the private variable if the intent is null</span>
+                        <span class="s1">result = data == </span><span class="s0">null </span><span class="s1">? mCapturedImageURI : data.getData()</span><span class="s0">;</span>
+                    <span class="s1">}</span>
+                <span class="s1">} </span><span class="s0">catch </span><span class="s1">(Exception e) {</span>
+                    <span class="s1">Toast.makeText(getApplicationContext()</span><span class="s0">, </span><span class="s3">&quot;activity :&quot; </span><span class="s1">+ e</span><span class="s0">, </span><span class="s1">Toast.LENGTH_LONG).show()</span><span class="s0">;</span>
+                <span class="s1">}</span>
+
+                <span class="s1">mUploadMessage.onReceiveValue(result)</span><span class="s0">;</span>
+                <span class="s1">mUploadMessage = </span><span class="s0">null;</span>
+            <span class="s1">}</span>
+
+        <span class="s1">} </span><span class="s2">// end of code for all versions except of Lollipop</span>
+
+        <span class="s2">// start of code for Lollipop only</span>
+        <span class="s0">if </span><span class="s1">(Build.VERSION.SDK_INT &gt;= Build.VERSION_CODES.LOLLIPOP) {</span>
+
+            <span class="s0">if </span><span class="s1">(requestCode != FILECHOOSER_RESULTCODE || mFilePathCallback == </span><span class="s0">null</span><span class="s1">) {</span>
+                <span class="s0">super</span><span class="s1">.onActivityResult(requestCode</span><span class="s0">, </span><span class="s1">resultCode</span><span class="s0">, </span><span class="s1">data)</span><span class="s0">;</span>
+                <span class="s0">return;</span>
+            <span class="s1">}</span>
+
+            <span class="s1">Uri[] results = </span><span class="s0">null;</span>
+
+            <span class="s2">// check that the response is a good one</span>
+            <span class="s0">if </span><span class="s1">(resultCode == Activity.RESULT_OK) {</span>
+                <span class="s0">if </span><span class="s1">(data == </span><span class="s0">null </span><span class="s1">|| data.getData() == </span><span class="s0">null</span><span class="s1">) {</span>
+                    <span class="s2">// if there is not data, then we may have taken a photo</span>
+                    <span class="s0">if </span><span class="s1">(mCameraPhotoPath != </span><span class="s0">null</span><span class="s1">) {</span>
+                        <span class="s1">results = </span><span class="s0">new </span><span class="s1">Uri[]{Uri.parse(mCameraPhotoPath)}</span><span class="s0">;</span>
+                    <span class="s1">}</span>
+                <span class="s1">} </span><span class="s0">else </span><span class="s1">{</span>
+                    <span class="s1">String dataString = data.getDataString()</span><span class="s0">;</span>
+                    <span class="s0">if </span><span class="s1">(dataString != </span><span class="s0">null</span><span class="s1">) {</span>
+                        <span class="s1">results = </span><span class="s0">new </span><span class="s1">Uri[]{Uri.parse(dataString)}</span><span class="s0">;</span>
+                    <span class="s1">}</span>
+                <span class="s1">}</span>
+            <span class="s1">}</span>
+
+            <span class="s1">mFilePathCallback.onReceiveValue(results)</span><span class="s0">;</span>
+            <span class="s1">mFilePathCallback = </span><span class="s0">null;</span>
+
+        <span class="s1">} </span><span class="s2">// end of code for Lollipop only</span>
+    <span class="s1">}</span>
+
+    <span class="s1">@Override</span>
+    <span class="s0">public boolean </span><span class="s1">onKeyDown(</span><span class="s0">int </span><span class="s1">keyCode</span><span class="s0">, </span><span class="s1">KeyEvent event) {</span>
+
+        <span class="s0">if </span><span class="s1">(keyCode == KeyEvent.KEYCODE_BACK &amp;&amp; webView.canGoBack()) {</span>
+            <span class="s1">webView.goBack()</span><span class="s0">;</span>
+            <span class="s0">return true;</span>
+        <span class="s1">}</span>
+
+        <span class="s0">return super</span><span class="s1">.onKeyDown(keyCode</span><span class="s0">, </span><span class="s1">event)</span><span class="s0">;</span>
+    <span class="s1">}</span>
+
+    <span class="s1">@Override</span>
+    <span class="s0">public void </span><span class="s1">onBackPressed() {</span>
+        <span class="s0">if </span><span class="s1">(webView.canGoBack()) {</span>
+            <span class="s1">webView.goBack()</span><span class="s0">;</span>
+        <span class="s1">} </span><span class="s0">else </span><span class="s1">{</span>
+            <span class="s1">AlertDialog.Builder builder = </span><span class="s0">new </span><span class="s1">AlertDialog.Builder(</span><span class="s0">this</span><span class="s1">)</span><span class="s0">;</span>
+            <span class="s1">builder.setTitle(</span><span class="s3">&quot;Exit Dialog&quot;</span><span class="s1">)</span>
+                    <span class="s1">.setIcon(R.drawable.icon)</span>
+                    <span class="s1">.setCancelable(</span><span class="s0">false</span><span class="s1">)</span>
+                    <span class="s1">.setMessage(</span><span class="s3">&quot;Are you sure you want to Exit?&quot;</span><span class="s1">)</span>
+                    <span class="s1">.setNegativeButton(R.string.no</span><span class="s0">, new </span><span class="s1">DialogInterface.OnClickListener() {</span>
+                        <span class="s1">@Override</span>
+                        <span class="s0">public void </span><span class="s1">onClick(DialogInterface dialog</span><span class="s0">, int </span><span class="s1">which) {</span>
+                            <span class="s1">dialog.cancel()</span><span class="s0">;</span>
+                        <span class="s1">}</span>
+                    <span class="s1">})</span>
+                    <span class="s1">.setNeutralButton(R.string.minimize</span><span class="s0">, new </span><span class="s1">DialogInterface.OnClickListener() {</span>
+                        <span class="s1">@Override</span>
+                        <span class="s0">public void </span><span class="s1">onClick(DialogInterface dialog</span><span class="s0">, int </span><span class="s1">which) {</span>
+                            <span class="s1">Intent startMain = </span><span class="s0">new </span><span class="s1">Intent(Intent.ACTION_MAIN)</span><span class="s0">;</span>
+                            <span class="s1">startMain.addCategory(Intent.CATEGORY_HOME)</span><span class="s0">;</span>
+                            <span class="s1">startMain.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)</span><span class="s0">;</span>
+                            <span class="s1">startActivity(startMain)</span><span class="s0">;</span>
+                        <span class="s1">}</span>
+                    <span class="s1">})</span>
+                    <span class="s1">.setPositiveButton(R.string.yes</span><span class="s0">, new </span><span class="s1">DialogInterface.OnClickListener() {</span>
+                        <span class="s1">@Override</span>
+                        <span class="s0">public void </span><span class="s1">onClick(DialogInterface dialogInterface</span><span class="s0">, int </span><span class="s1">i) {</span>
+                            <span class="s1">finish()</span><span class="s0">;</span>
+                        <span class="s1">}</span>
+                    <span class="s1">}).show()</span><span class="s0">;</span>
+        <span class="s1">}</span>
+    <span class="s1">}</span>
+
+    <span class="s1">@Override</span>
+    <span class="s0">protected void </span><span class="s1">onSaveInstanceState(Bundle outState) {</span>
+        <span class="s0">super</span><span class="s1">.onSaveInstanceState(outState)</span><span class="s0">;</span>
+        <span class="s1">webView.saveState(outState)</span><span class="s0">;</span>
+    <span class="s1">}</span>
+
+    <span class="s0">public void </span><span class="s1">checkConnection() {</span>
+
+        <span class="s1">ConnectivityManager connectivityManager = (ConnectivityManager)</span>
+                <span class="s0">this</span><span class="s1">.getSystemService(Context.CONNECTIVITY_SERVICE)</span><span class="s0">;</span>
+        <span class="s1">NetworkInfo wifi = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI)</span><span class="s0">;</span>
+        <span class="s1">NetworkInfo mobileNetwork = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE)</span><span class="s0">;</span>
+
+        <span class="s0">if </span><span class="s1">(wifi.isConnected()) {</span>
+            <span class="s1">webView.loadUrl(webUrl)</span><span class="s0">;</span>
+            <span class="s1">webView.setVisibility(View.VISIBLE)</span><span class="s0">;</span>
+            <span class="s1">relativeLayout.setVisibility(View.GONE)</span><span class="s0">;</span>
+        <span class="s1">} </span><span class="s0">else if </span><span class="s1">(mobileNetwork.isConnected()) {</span>
+            <span class="s1">webView.loadUrl(webUrl)</span><span class="s0">;</span>
+            <span class="s1">webView.setVisibility(View.VISIBLE)</span><span class="s0">;</span>
+            <span class="s1">relativeLayout.setVisibility(View.GONE)</span><span class="s0">;</span>
+        <span class="s1">} </span><span class="s0">else </span><span class="s1">{</span>
+            <span class="s1">webView.setVisibility(View.GONE)</span><span class="s0">;</span>
+            <span class="s1">relativeLayout.setVisibility(View.VISIBLE)</span><span class="s0">;</span>
+        <span class="s1">}</span>
+    <span class="s1">}</span>
+<span class="s1">}</span>
+</pre>
+</body>
+</html>
